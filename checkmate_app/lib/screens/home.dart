@@ -1,4 +1,5 @@
 import 'package:checkmate_app/assets/constants.dart';
+import 'package:checkmate_app/screens/new_entry.dart';
 import 'package:flutter/material.dart';
 
 class Home extends StatefulWidget {
@@ -32,7 +33,12 @@ class _HomeState extends State<Home> {
                             fontWeight: FontWeight.bold),
                       ),
                       InkWell(
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const NewEntry()));
+                        },
                         child: const Icon(
                           Icons.add,
                           color: cConstrastColor,
