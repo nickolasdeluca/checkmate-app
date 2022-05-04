@@ -1,6 +1,10 @@
 import 'package:checkmate_app/assets/constants.dart';
+import 'package:checkmate_app/assets/dialogs.dart';
+import 'package:checkmate_app/models/entries/entry.dart';
+import 'package:checkmate_app/models/items/item.dart';
 import 'package:date_field/date_field.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 
 class NewEntry extends StatefulWidget {
   const NewEntry({Key? key}) : super(key: key);
@@ -10,6 +14,12 @@ class NewEntry extends StatefulWidget {
 }
 
 class _NewEntryState extends State<NewEntry> {
+  Entry entry = Entry(id: 1, items: []);
+
+  Future<List<Item>>? _getItems() async {
+    return entry.items;
+  }
+
   TextEditingController localController = TextEditingController();
 
   @override
@@ -30,7 +40,7 @@ class _NewEntryState extends State<NewEntry> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                'Data',
+                'Where',
                 style: TextStyle(
                     color: cConstrastColor,
                     fontSize: 30,
@@ -57,7 +67,7 @@ class _NewEntryState extends State<NewEntry> {
                 height: 20,
               ),
               const Text(
-                'Local',
+                'Place',
                 style: TextStyle(
                     color: cConstrastColor,
                     fontSize: 30,
@@ -85,14 +95,16 @@ class _NewEntryState extends State<NewEntry> {
               ),
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                 const Text(
-                  'Consumo',
+                  'Items',
                   style: TextStyle(
                       color: cConstrastColor,
                       fontSize: 30,
                       fontWeight: FontWeight.bold),
                 ),
                 InkWell(
-                  onTap: () {},
+                  onTap: () {
+                    Dialogs().newItem(context);
+                  },
                   child: const Icon(
                     Icons.add,
                     color: cConstrastColor,
@@ -103,96 +115,38 @@ class _NewEntryState extends State<NewEntry> {
                 height: 20,
               ),
               Flexible(
-                  child: SingleChildScrollView(
-                child: Column(
-                  children: const [
-                    SizedBox(
-                      height: 75,
-                      child: InkWell(
-                        child: Card(
-                          shadowColor: cConstrastColor,
-                          elevation: 5,
-                          child: ListTile(
-                            title: Text('Produto: Gelada'),
-                            subtitle: Text('Quantidade: 10 - Valor: R\$10,00'),
-                            trailing: Icon(Icons.arrow_forward_ios_rounded),
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 75,
-                      child: InkWell(
-                        child: Card(
-                          shadowColor: cConstrastColor,
-                          elevation: 5,
-                          child: ListTile(
-                            title: Text('Produto: Gelada'),
-                            subtitle: Text('Quantidade: 10 - Valor: R\$10,00'),
-                            trailing: Icon(Icons.arrow_forward_ios_rounded),
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 75,
-                      child: InkWell(
-                        child: Card(
-                          shadowColor: cConstrastColor,
-                          elevation: 5,
-                          child: ListTile(
-                            title: Text('Produto: Gelada'),
-                            subtitle: Text('Quantidade: 10 - Valor: R\$10,00'),
-                            trailing: Icon(Icons.arrow_forward_ios_rounded),
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 75,
-                      child: InkWell(
-                        child: Card(
-                          shadowColor: cConstrastColor,
-                          elevation: 5,
-                          child: ListTile(
-                            title: Text('Produto: Gelada'),
-                            subtitle: Text('Quantidade: 10 - Valor: R\$10,00'),
-                            trailing: Icon(Icons.arrow_forward_ios_rounded),
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 75,
-                      child: InkWell(
-                        child: Card(
-                          shadowColor: cConstrastColor,
-                          elevation: 5,
-                          child: ListTile(
-                            title: Text('Produto: Gelada'),
-                            subtitle: Text('Quantidade: 10 - Valor: R\$10,00'),
-                            trailing: Icon(Icons.arrow_forward_ios_rounded),
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 75,
-                      child: InkWell(
-                        child: Card(
-                          shadowColor: cConstrastColor,
-                          elevation: 5,
-                          child: ListTile(
-                            title: Text('Produto: Gelada'),
-                            subtitle: Text('Quantidade: 10 - Valor: R\$10,00'),
-                            trailing: Icon(Icons.arrow_forward_ios_rounded),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ))
+                  child: FutureBuilder(
+                future: _getItems(),
+                builder:
+                    (BuildContext context, AsyncSnapshot<List<Item>> snapshot) {
+                  if (snapshot.hasData) {
+                    return ListView.builder(
+                        itemCount: snapshot.data!.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return const SizedBox(
+                            height: 75,
+                            child: InkWell(
+                              child: Card(
+                                shadowColor: cConstrastColor,
+                                elevation: 5,
+                                child: ListTile(
+                                  title: Text(''),
+                                  subtitle:
+                                      Text('Quantidade: 10 - Valor: R\$10,00'),
+                                  trailing:
+                                      Icon(Icons.arrow_forward_ios_rounded),
+                                ),
+                              ),
+                            ),
+                          );
+                        });
+                  } else {
+                    return const Center(
+                      child: CircularProgressIndicator.adaptive(),
+                    );
+                  }
+                },
+              )),
             ],
           ),
         ),
