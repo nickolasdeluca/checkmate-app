@@ -116,11 +116,13 @@ class Dialogs {
                           return;
                         }
 
-                        if (priceController.text.isEmpty) {
+                        if ((priceController.text.isEmpty) ||
+                            (double.tryParse(priceController.text) == null)) {
                           return;
                         }
 
-                        if (amountController.text.isEmpty) {
+                        if ((amountController.text.isEmpty) ||
+                            (double.tryParse(amountController.text) == null)) {
                           return;
                         }
 
@@ -128,7 +130,7 @@ class Dialogs {
                         item.price = double.parse(priceController.text);
                         item.amount = double.parse(amountController.text);
 
-                        Navigator.pop(context);
+                        Navigator.pop(context, item);
                       },
                       child: const Text('Add'))
                 ],
