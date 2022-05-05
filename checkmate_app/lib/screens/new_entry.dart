@@ -103,8 +103,12 @@ class _NewEntryState extends State<NewEntry> {
                 ),
                 InkWell(
                   onTap: () {
-                    Dialogs().newItem(context);
+                    Dialogs().newItem(context).then((value) {
+                      entry.items.add(value);
+                      setState(() {});
+                    });
                   },
+                  // entry.items.add(item)
                   child: const Icon(
                     Icons.add,
                     color: cConstrastColor,
@@ -123,18 +127,18 @@ class _NewEntryState extends State<NewEntry> {
                     return ListView.builder(
                         itemCount: snapshot.data!.length,
                         itemBuilder: (BuildContext context, int index) {
-                          return const SizedBox(
+                          return SizedBox(
                             height: 75,
                             child: InkWell(
                               child: Card(
                                 shadowColor: cConstrastColor,
                                 elevation: 5,
                                 child: ListTile(
-                                  title: Text(''),
-                                  subtitle:
-                                      Text('Quantidade: 10 - Valor: R\$10,00'),
-                                  trailing:
-                                      Icon(Icons.arrow_forward_ios_rounded),
+                                  title: Text(snapshot.data![index].name),
+                                  subtitle: Text(
+                                      'Amount: ${snapshot.data![index].amount} - Price: ${snapshot.data![index].price}'),
+                                  trailing: const Icon(
+                                      Icons.arrow_forward_ios_rounded),
                                 ),
                               ),
                             ),
