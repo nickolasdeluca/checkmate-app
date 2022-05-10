@@ -3,6 +3,7 @@ import 'package:checkmate_app/assets/dialogs.dart';
 import 'package:checkmate_app/models/entries/entry.dart';
 import 'package:checkmate_app/models/items/item.dart';
 import 'package:date_field/date_field.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 
@@ -13,11 +14,44 @@ class NewEntry extends StatefulWidget {
   State<NewEntry> createState() => _NewEntryState();
 }
 
+InputDecoration _inputBorder = const InputDecoration(
+  enabledBorder:
+      OutlineInputBorder(borderSide: BorderSide(color: cConstrastColor)),
+  focusedBorder:
+      OutlineInputBorder(borderSide: BorderSide(color: cConstrastColor)),
+  errorBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.red)),
+  focusedErrorBorder:
+      OutlineInputBorder(borderSide: BorderSide(color: Colors.red)),
+);
+
 class _NewEntryState extends State<NewEntry> {
-  Entry entry = Entry(id: 1, items: []);
+  Entry entry = Entry(id: 0, date: DateTime.now(), items: []);
 
   Future<List<Item>>? _getItems() async {
     return entry.items;
+  }
+
+  dynamic _textValidator(String? value) {
+    if ((value != null) && (value.isNotEmpty)) {
+    } else {
+      return "You must provide a location";
+    }
+  }
+
+  void _saveEntry() async {
+    if (kDebugMode) {
+      print(entry.toJson());
+    }
+
+    if (localController.text.isEmpty) {
+      return;
+    }
+
+    entry.place = localController.text;
+
+    Box box = Hive.box<Entry>('entries');
+
+    box.add(entry);
   }
 
   TextEditingController localController = TextEditingController();
@@ -30,6 +64,20 @@ class _NewEntryState extends State<NewEntry> {
         title: const Text('Add a new entry'),
         backgroundColor: cBackgroundColor,
         elevation: 0,
+        actions: [
+          Padding(
+              padding: const EdgeInsets.only(right: 15),
+              child: GestureDetector(
+                onTap: (() {
+                  _saveEntry();
+                }),
+                child: const Icon(
+                  Icons.save,
+                  color: cConstrastColor,
+                  size: 25,
+                ),
+              ))
+        ],
       ),
       body: SafeArea(
         top: true,
@@ -40,7 +88,7 @@ class _NewEntryState extends State<NewEntry> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                'Where',
+                'When',
                 style: TextStyle(
                     color: cConstrastColor,
                     fontSize: 30,
@@ -58,16 +106,18 @@ class _NewEntryState extends State<NewEntry> {
                       color: cConstrastColor,
                     ),
                     floatingLabelStyle: TextStyle(color: cConstrastColor)),
-                mode: DateTimeFieldPickerMode.date,
+                mode: DateTimeFieldPickerMode.dateAndTime,
                 dateTextStyle: const TextStyle(color: cConstrastColor),
                 initialValue: DateTime.now(),
-                onDateSelected: (DateTime value) {},
+                onDateSelected: (DateTime value) {
+                  entry.date = value;
+                },
               ),
               const SizedBox(
                 height: 20,
               ),
               const Text(
-                'Place',
+                'Where',
                 style: TextStyle(
                     color: cConstrastColor,
                     fontSize: 30,
@@ -76,18 +126,19 @@ class _NewEntryState extends State<NewEntry> {
               const SizedBox(
                 height: 20,
               ),
-              TextField(
+              TextFormField(
+                decoration: _inputBorder.copyWith(
+                  floatingLabelStyle: const TextStyle(color: cConstrastColor),
+                  suffixIcon: const Icon(
+                    Icons.place,
+                    color: cConstrastColor,
+                  ),
+                ),
                 controller: localController,
-                decoration: const InputDecoration(
-                    enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: cConstrastColor)),
-                    focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: cConstrastColor)),
-                    suffixIcon: Icon(
-                      Icons.place,
-                      color: cConstrastColor,
-                    ),
-                    floatingLabelStyle: TextStyle(color: cConstrastColor)),
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                validator: (value) {
+                  return _textValidator(value);
+                },
                 style: const TextStyle(color: cConstrastColor),
               ),
               const SizedBox(
@@ -108,7 +159,6 @@ class _NewEntryState extends State<NewEntry> {
                       setState(() {});
                     });
                   },
-                  // entry.items.add(item)
                   child: const Icon(
                     Icons.add,
                     color: cConstrastColor,
