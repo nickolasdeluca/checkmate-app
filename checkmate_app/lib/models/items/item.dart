@@ -17,4 +17,6 @@ class Item extends HiveObject {
   double amount;
 
   Item(this.id, this.name, this.price, this.amount);
+
+  Map toJson() => {'id': id, 'name': name, 'amount': amount};
 }

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:checkmate_app/models/items/item.dart';
 import 'package:hive/hive.dart';
 
@@ -18,4 +20,7 @@ class Entry extends HiveObject {
   List<Item> items;
 
   Entry({required this.id, this.date, this.place, required this.items});
+
+  Map toJson() =>
+      {'id': id, 'date': date, 'place': place, 'items': jsonEncode(items)};
 }
