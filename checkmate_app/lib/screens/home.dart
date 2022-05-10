@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:checkmate_app/assets/constants.dart';
 import 'package:checkmate_app/models/entries/entry.dart';
 import 'package:checkmate_app/screens/new_entry.dart';
@@ -46,10 +48,11 @@ class _HomeState extends State<Home> {
                       ),
                       InkWell(
                         onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const NewEntry()));
+                          Route route = MaterialPageRoute(
+                              builder: (context) => const NewEntry());
+                          Navigator.push(context, route).then(
+                            (value) => {setState(() {})},
+                          );
                         },
                         child: const Icon(
                           Icons.add,

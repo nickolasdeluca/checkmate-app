@@ -70,6 +70,7 @@ class _NewEntryState extends State<NewEntry> {
               child: GestureDetector(
                 onTap: (() {
                   _saveEntry();
+                  Navigator.pop(context);
                 }),
                 child: const Icon(
                   Icons.save,
