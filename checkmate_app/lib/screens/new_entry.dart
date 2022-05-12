@@ -8,8 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 
 class NewEntry extends StatefulWidget {
-  final Entry? remoteEntry;
-  const NewEntry({Key? key, this.remoteEntry}) : super(key: key);
+  final dynamic boxKey;
+  const NewEntry({Key? key, this.boxKey}) : super(key: key);
 
   @override
   State<NewEntry> createState() => _NewEntryState();
@@ -33,7 +33,8 @@ class _NewEntryState extends State<NewEntry> {
 
   @override
   void initState() {
-    entry = widget.remoteEntry ?? Entry(id: 0, items: []);
+    Box box = Hive.box<Entry>('entries');
+    entry = box.get(widget.boxKey) ?? Entry(id: 0, items: []);
     localController.text = entry.place ?? "";
 
     super.initState();
@@ -63,7 +64,11 @@ class _NewEntryState extends State<NewEntry> {
 
     Box box = Hive.box<Entry>('entries');
 
-    box.add(entry);
+    if (box.containsKey(widget.boxKey)) {
+      box.put(widget.boxKey, entry);
+    } else {
+      box.add(entry);
+    }
   }
 
   TextEditingController localController = TextEditingController();

@@ -86,10 +86,9 @@ class _HomeState extends State<Home> {
                                     child: const Icon(
                                         Icons.arrow_forward_ios_rounded),
                                     onTap: () {
-                                      Box box = Hive.box<Entry>('entries');
                                       Route route = MaterialPageRoute(
                                         builder: (context) => NewEntry(
-                                          remoteEntry: box.getAt(index),
+                                          boxKey: snapshot.data![index].key,
                                         ),
                                       );
                                       Navigator.push(context, route).then(
