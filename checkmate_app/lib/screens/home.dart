@@ -74,17 +74,28 @@ class _HomeState extends State<Home> {
                           itemBuilder: (BuildContext context, int index) {
                             return SizedBox(
                               height: 75,
-                              child: InkWell(
-                                child: Card(
-                                  shadowColor: cConstrastColor,
-                                  elevation: 5,
-                                  child: ListTile(
-                                    title: Text(
-                                        'Where: ${snapshot.data![index].place.toString()}'),
-                                    subtitle: Text(
-                                        'When: ${snapshot.data![index].date.toString()}'),
-                                    trailing: const Icon(
+                              child: Card(
+                                shadowColor: cConstrastColor,
+                                elevation: 5,
+                                child: ListTile(
+                                  title: Text(
+                                      'Where: ${snapshot.data![index].place.toString()}'),
+                                  subtitle: Text(
+                                      'When: ${snapshot.data![index].date.toString()}'),
+                                  trailing: GestureDetector(
+                                    child: const Icon(
                                         Icons.arrow_forward_ios_rounded),
+                                    onTap: () {
+                                      Box box = Hive.box<Entry>('entries');
+                                      Route route = MaterialPageRoute(
+                                        builder: (context) => NewEntry(
+                                          remoteEntry: box.getAt(index),
+                                        ),
+                                      );
+                                      Navigator.push(context, route).then(
+                                        (value) => {setState(() {})},
+                                      );
+                                    },
                                   ),
                                 ),
                               ),

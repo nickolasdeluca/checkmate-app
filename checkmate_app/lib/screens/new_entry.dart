@@ -8,7 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 
 class NewEntry extends StatefulWidget {
-  const NewEntry({Key? key}) : super(key: key);
+  final Entry? remoteEntry;
+  const NewEntry({Key? key, this.remoteEntry}) : super(key: key);
 
   @override
   State<NewEntry> createState() => _NewEntryState();
@@ -25,10 +26,17 @@ InputDecoration _inputBorder = const InputDecoration(
 );
 
 class _NewEntryState extends State<NewEntry> {
-  Entry entry = Entry(id: 0, date: DateTime.now(), items: []);
-
+  Entry entry = Entry(id: 0, items: []);
   Future<List<Item>>? _getItems() async {
     return entry.items;
+  }
+
+  @override
+  void initState() {
+    entry = widget.remoteEntry ?? Entry(id: 0, items: []);
+    localController.text = entry.place ?? "";
+
+    super.initState();
   }
 
   dynamic _textValidator(String? value) {
@@ -36,6 +44,10 @@ class _NewEntryState extends State<NewEntry> {
     } else {
       return "You must provide a location";
     }
+  }
+
+  DateTime _getInitialDate() {
+    return entry.date ?? DateTime.now();
   }
 
   void _saveEntry() async {
@@ -109,7 +121,7 @@ class _NewEntryState extends State<NewEntry> {
                     floatingLabelStyle: TextStyle(color: cConstrastColor)),
                 mode: DateTimeFieldPickerMode.dateAndTime,
                 dateTextStyle: const TextStyle(color: cConstrastColor),
-                initialValue: DateTime.now(),
+                initialValue: _getInitialDate(),
                 onDateSelected: (DateTime value) {
                   entry.date = value;
                 },
