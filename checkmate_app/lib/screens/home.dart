@@ -1,12 +1,26 @@
+import 'dart:async';
+
 import 'package:checkmate_app/assets/constants.dart';
+import 'package:checkmate_app/models/entries/entry.dart';
 import 'package:checkmate_app/screens/new_entry.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
 
   @override
   State<Home> createState() => _HomeState();
+}
+
+Future<List<Entry>>? _getItems() async {
+  Box box = Hive.box<Entry>('entries');
+  List<Entry> entries = [];
+  for (var value in box.values) {
+    entries.add(value);
+  }
+
+  return entries;
 }
 
 class _HomeState extends State<Home> {
@@ -34,10 +48,11 @@ class _HomeState extends State<Home> {
                       ),
                       InkWell(
                         onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const NewEntry()));
+                          Route route = MaterialPageRoute(
+                              builder: (context) => const NewEntry());
+                          Navigator.push(context, route).then(
+                            (value) => {setState(() {})},
+                          );
                         },
                         child: const Icon(
                           Icons.add,
@@ -48,76 +63,50 @@ class _HomeState extends State<Home> {
                 const SizedBox(
                   height: 20,
                 ),
-                const SizedBox(
-                  height: 85,
-                  child: InkWell(
-                    child: Card(
-                      shadowColor: cConstrastColor,
-                      elevation: 5,
-                      child: ListTile(
-                        title: Text('Data: 23/04/2022'),
-                        subtitle: Text('Local: Antonio\'s '),
-                        trailing: Icon(Icons.arrow_forward_ios_rounded),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 85,
-                  child: InkWell(
-                    child: Card(
-                      shadowColor: cConstrastColor,
-                      elevation: 5,
-                      child: ListTile(
-                        title: Text('Data: 24/04/2022'),
-                        subtitle: Text('Local: Let\'s Drop Pub'),
-                        trailing: Icon(Icons.arrow_forward_ios_rounded),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 85,
-                  child: InkWell(
-                    child: Card(
-                      shadowColor: cConstrastColor,
-                      elevation: 5,
-                      child: ListTile(
-                        title: Text('Data: 25/04/2022'),
-                        subtitle: Text('Local: Pomar'),
-                        trailing: Icon(Icons.arrow_forward_ios_rounded),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 85,
-                  child: InkWell(
-                    child: Card(
-                      shadowColor: cConstrastColor,
-                      elevation: 5,
-                      child: ListTile(
-                        title: Text('Data: 26/04/2022'),
-                        subtitle: Text('Local: Montalccino'),
-                        trailing: Icon(Icons.arrow_forward_ios_rounded),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 85,
-                  child: InkWell(
-                    child: Card(
-                      shadowColor: cConstrastColor,
-                      elevation: 5,
-                      child: ListTile(
-                        title: Text('Data: 26/04/2022'),
-                        subtitle: Text('Local: Van Tap'),
-                        trailing: Icon(Icons.arrow_forward_ios_rounded),
-                      ),
-                    ),
-                  ),
-                ),
+                Flexible(
+                    child: FutureBuilder(
+                  future: _getItems(),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<List<Entry>> snapshot) {
+                    if (snapshot.hasData) {
+                      return ListView.builder(
+                          itemCount: snapshot.data!.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return SizedBox(
+                              height: 75,
+                              child: Card(
+                                shadowColor: cConstrastColor,
+                                elevation: 5,
+                                child: ListTile(
+                                  title: Text(
+                                      'Where: ${snapshot.data![index].place.toString()}'),
+                                  subtitle: Text(
+                                      'When: ${snapshot.data![index].date.toString()}'),
+                                  trailing: GestureDetector(
+                                    child: const Icon(
+                                        Icons.arrow_forward_ios_rounded),
+                                    onTap: () {
+                                      Route route = MaterialPageRoute(
+                                        builder: (context) => NewEntry(
+                                          boxKey: snapshot.data![index].key,
+                                        ),
+                                      );
+                                      Navigator.push(context, route).then(
+                                        (value) => {setState(() {})},
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+                            );
+                          });
+                    } else {
+                      return const Center(
+                        child: CircularProgressIndicator.adaptive(),
+                      );
+                    }
+                  },
+                )),
               ],
             ),
           )),
